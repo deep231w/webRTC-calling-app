@@ -1,5 +1,5 @@
 {
-  "name": "my-turborepo",
+  "name": "webrtc-test",
   "private": true,
   "scripts": {
     "build": "turbo run build",
