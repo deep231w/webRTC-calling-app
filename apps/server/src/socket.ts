@@ -9,6 +9,12 @@ export function InitSocket(server:HttpServer){
     io.on("connection",(socket)=>{
         console.log("socket connected - ", socket.id);
 
+        socket.on("join-room",(email:string, room:string)=>{
+            console.log("joined room user - ", email, room);
+
+
+        })
+
         socket.on("disconnect",()=>{
             console.log("client disconnected -", socket.id);
         })
