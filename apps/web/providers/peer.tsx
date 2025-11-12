@@ -4,8 +4,9 @@ import {createContext, ReactNode, useContext, useEffect, useMemo, useState} from
 
 interface PeerContextType{
     peer:RTCPeerConnection | null;
-    CreateOffer:()=>void;
-    CreateAnswer:()=>void;
+    CreateOffer: () => Promise<RTCSessionDescriptionInit | null>;
+    CreateAnswer: ( offer: RTCSessionDescriptionInit ) => Promise<RTCSessionDescriptionInit | null>;
+    saveAnswer:(answer:RTCSessionDescriptionInit)=>void;
 }
 
 const PeerContext=createContext<PeerContextType | null>(null);
@@ -68,20 +69,24 @@ export const PeerProvider=({children}:{children:ReactNode})=>{
     const CreateOffer = async () => {
         if (!peer) return null;
         const offer = await peer.createOffer();
-        await peer.setLocalDescription(offer);
+        await peer.setLocalDescription(new RTCSessionDescription(offer));
         return offer;
     };
 
-    const CreateAnswer = async () => {
+    const CreateAnswer = async (offer:RTCSessionDescriptionInit) => {
         if (!peer) return null;
+        await peer.setRemoteDescription(new RTCSessionDescription(offer))
         const answer = await peer.createAnswer();
-        await peer.setLocalDescription(answer);
+        await peer.setLocalDescription(new RTCSessionDescription(answer));
         return answer;
     };
 
+    const saveAnswer= async(answer:RTCSessionDescriptionInit)=>{
+        await peer?.setRemoteDescription(answer);
+    }
 
     return(
-        <PeerContext.Provider value={{peer,CreateOffer,CreateAnswer}}>
+        <PeerContext.Provider value={{peer,CreateOffer,CreateAnswer, saveAnswer}}>
             {children}
         </PeerContext.Provider>
     )

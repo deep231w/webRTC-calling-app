@@ -22,6 +22,28 @@ export function InitSocket(server:HttpServer){
             io.to(socket.id).emit('join_room',{email ,room})
         })
 
+        socket.on("call_user",(data)=>{
+            const {id,offer}=data;
+
+            io.to(id).emit('incoming_call',{from:socket.id ,offer});
+
+        })
+
+        socket.on("call_accept",(data)=>{
+            const {to ,answer}=data;
+
+            io.to(to).emit("call_accepted",{from:socket.id, answer});
+
+        })
+
+        socket.on('send_candidate',(data)=>{
+            const {to, candidate}=data;
+
+            io.to(to).emit('recieve_candidate',{from:socket.id , candidate});
+            
+        })
+        
+
         socket.on("disconnect",()=>{
             console.log("client disconnected -", socket.id);
         })
