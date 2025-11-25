@@ -2,6 +2,7 @@ import express,{Request ,Response} from 'express';
 import User from '../models/User';
 import jwt from 'jsonwebtoken';
 
+
 const router= express.Router();
 
 interface signUpBody{
@@ -20,6 +21,13 @@ router.post('/signup',async(req:Request<{}, {}, signUpBody> ,res:Response)=>{
     try{    
         const {email, name, password}=req.body;
         console.log("email , name , pass=", email ,name , password);
+
+        if(!email || !name || !password){
+            res.status(400).json({
+                message:"invalid credentials"
+            })
+            return;
+        }
 
         const user= await User.findOne({email});
 
@@ -43,9 +51,10 @@ router.post('/signup',async(req:Request<{}, {}, signUpBody> ,res:Response)=>{
             { expiresIn: "7d" }
         )
 
-        res.status(200).json({
+        return res.status(200).json({
             message:"signup completed",
-            user:newUser
+            user:newUser,
+            token:token
         })
 
     }catch(e){
@@ -56,14 +65,56 @@ router.post('/signup',async(req:Request<{}, {}, signUpBody> ,res:Response)=>{
     }
 })
 
-router.post("/signin",(req:Request<{},{},signInBody>, res:Response)=>{
-    const {email , password}=req.body;
+router.post("/signin",async(req:Request<{},{},signInBody>, res:Response)=>{
+    try{
+        const {email , password}=req.body;
 
-    console.log("email , password", email  ,password);
+        if(!email || !password){
+            res.status(400).json({
+                message:"invalid credential"
+            })
 
-    res.status(200).json({
-        message:"sign in completed"
-    })
+            return;
+        }
+
+        console.log("email , password", email  ,password);
+
+        const user = await User.findOne({email});
+
+        if(!user){
+            res.status(403).json({
+                message:"user doesnot exist "
+            })
+            return ;
+        }
+
+        const userPassword =user.password;
+        
+        if(password !=userPassword){
+            res.status(404).json({
+                message:"password didnt match"
+            })
+            return;
+        }
+
+        const token= jwt.sign(
+            {id:user._id, email:user.email},
+            process.env.JWT_SECRET!,
+            {expiresIn:"7d"}
+        )
+
+        return res.status(200).json({
+            message:"sign in completed",
+            user:user,
+            token:token
+        })
+    }catch(e){
+        console.log("error during signin =", e);
+
+        res.status(500).json({
+            message:"server error"
+        })
+    }
 })
 
 export default router;

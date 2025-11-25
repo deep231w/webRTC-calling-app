@@ -4,9 +4,11 @@ import dotenv from "dotenv";
 import { InitSocket } from './socket';
 import http from 'http';
 import router from './auth/user';
+import { connectDB } from './lib/mongodb';
 
 dotenv.config();
 
+connectDB();
 const app = express();
 const PORT = process.env.PORT || 5000;
 

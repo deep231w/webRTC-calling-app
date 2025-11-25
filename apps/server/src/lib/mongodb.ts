@@ -1,7 +1,10 @@
+import { configDotenv } from "dotenv";
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI as string;
+configDotenv()
 
+const MONGODB_URI = process.env.MONGODB_URI as string;
+console.log("db -", MONGODB_URI)
 if (!MONGODB_URI) {
   throw new Error("Please add MONGODB_URI to .env");
 }
