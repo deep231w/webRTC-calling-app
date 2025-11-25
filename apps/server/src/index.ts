@@ -5,14 +5,17 @@ import { InitSocket } from './socket';
 import http from 'http';
 import router from './auth/user';
 import { connectDB } from './lib/mongodb';
-
 dotenv.config();
 
 connectDB();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:3001",  
+    credentials: true,                
+}));
+
 app.use(express.json());
 
 const server = http.createServer(app);

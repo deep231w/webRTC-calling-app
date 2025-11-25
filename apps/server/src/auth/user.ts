@@ -53,9 +53,10 @@ router.post('/signup',async(req:Request<{}, {}, signUpBody> ,res:Response)=>{
 
         res.cookie('token',token,{
             httpOnly:true,
-            secure:process.env.NODE_ENV === 'production',
-            sameSite:"strict",
-            path:"/"
+            secure:false,
+            sameSite:"lax",
+            path:"/",
+            domain: "localhost"
         })
 
         return res.status(200).json({
@@ -112,9 +113,10 @@ router.post("/signin",async(req:Request<{},{},signInBody>, res:Response)=>{
 
         res.cookie('token',token,{
             httpOnly:true,
-            secure:process.env.NODE_ENV === 'production',
-            sameSite:"strict",
-            path:"/"
+            secure: false,
+            sameSite:"lax",
+            path:"/",
+            domain: "localhost"
         })
 
         return res.status(200).json({
