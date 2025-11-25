@@ -1,7 +1,7 @@
 import express,{Request ,Response} from 'express';
 import User from '../models/User';
 import jwt from 'jsonwebtoken';
-
+import cookie from 'cookie';
 
 const router= express.Router();
 
@@ -50,6 +50,13 @@ router.post('/signup',async(req:Request<{}, {}, signUpBody> ,res:Response)=>{
            process.env.JWT_SECRET!,
             { expiresIn: "7d" }
         )
+
+        res.cookie('token',token,{
+            httpOnly:true,
+            secure:process.env.NODE_ENV === 'production',
+            sameSite:"strict",
+            path:"/"
+        })
 
         return res.status(200).json({
             message:"signup completed",
@@ -102,6 +109,13 @@ router.post("/signin",async(req:Request<{},{},signInBody>, res:Response)=>{
             process.env.JWT_SECRET!,
             {expiresIn:"7d"}
         )
+
+        res.cookie('token',token,{
+            httpOnly:true,
+            secure:process.env.NODE_ENV === 'production',
+            sameSite:"strict",
+            path:"/"
+        })
 
         return res.status(200).json({
             message:"sign in completed",
