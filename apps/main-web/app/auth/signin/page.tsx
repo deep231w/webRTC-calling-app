@@ -1,15 +1,26 @@
 "use client";
 
 import React, { useState } from "react";
-
+import axios from "axios";
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSignIn = (e: React.FormEvent) => {
+  console.log("bc url- ",process.env.NEXT_PUBLIC_BACKEND_URL )
+
+  const handleSignIn = async(e: React.FormEvent) => {
     e.preventDefault();
     console.log("Sign in with:", email, password);
-    // TODO: Call your API route
+    
+    const response= await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/signin`,{
+        email,
+        password
+    },{withCredentials:true})
+
+    console.log("response of signin = ", response);
+
+    localStorage.setItem("user",response?.data?.user);
+
   };
 
   return (
