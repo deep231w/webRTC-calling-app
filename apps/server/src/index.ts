@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { InitSocket } from './socket';
 import http from 'http';
+import router from './auth/user';
 
 dotenv.config();
 
@@ -13,6 +14,8 @@ app.use(cors());
 app.use(express.json());
 
 const server = http.createServer(app);
+
+app.use('/api/v1',router);
 
 InitSocket(server)
 app.get("/", (req, res) => {
