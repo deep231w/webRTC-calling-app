@@ -121,7 +121,7 @@ router.post("/signin",async(req:Request<{},{},signInBody>, res:Response)=>{
 
         return res.status(200).json({
             message:"sign in completed",
-            user:user,
+            user:user,  
             token:token
         })
     }catch(e){
@@ -133,4 +133,19 @@ router.post("/signin",async(req:Request<{},{},signInBody>, res:Response)=>{
     }
 })
 
+router.get("/users",async(req:Request , res:Response)=>{
+    try{
+        const users= await User.find({}).select("-password")
+        return res.status(200).json({
+            message:"fetched users!",
+            users:users
+        })
+        
+    }catch(e){
+        console.log("error during getting users -", e);
+        res.status(500).json({
+            message:"server error "
+        })
+    }
+})
 export default router;
