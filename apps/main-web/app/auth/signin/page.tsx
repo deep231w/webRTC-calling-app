@@ -19,7 +19,7 @@ export default function SignInPage() {
 
     console.log("response of signin = ", response);
 
-    localStorage.setItem("user",response?.data?.user);
+    localStorage.setItem("user",JSON.stringify(response?.data?.user));
 
   };
 
