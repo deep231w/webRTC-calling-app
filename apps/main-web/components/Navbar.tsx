@@ -1,22 +1,31 @@
+"use client";
+
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import ProfileDropdown from './ProfileDropdoen';
 
 export  function Navbar (){
-    const user= JSON.parse(localStorage.getItem("user")|| "{}");
+    const [user, setUser] = useState<any>(null);
+
+    useEffect(() => {
+        const data = localStorage.getItem("user");
+        console.log("data", data)
+        if (data) {
+            setUser(JSON.parse(data));
+        }
+
+        console.log("user in nav0 ", user)
+    }, []);
+
 
     return(
         <div className="mx-3 my-3 shadow-xl/10 border rounded-xl border-solid ">
-            <div className="px-5 py-3 flex justify-between">
+            <div className="px-5 py-3 flex justify-between items-center">
                 <div>
-                    {user.name}
+                    {user?.name?.charAt(0).toUpperCase() + user?.name?.slice(1) || "Guest"}
                 </div>
                 <div>
-                    <Image
-                        src="/user.png" 
-                        alt="Profile" 
-                        width={40}
-                        height={40}
-                        className="rounded-full cursor-pointer"
-                    />
+                    <ProfileDropdown/>
                 </div>
             </div>
         </div>

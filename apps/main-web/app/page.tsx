@@ -5,9 +5,6 @@ import { Button } from "@/components/ui/button";
 import { UserCard } from "@/components/UserCard";
 export default function Home() {
 
-  const user= JSON.parse(localStorage.getItem("user")|| "{}");
-  
-  console.log("user= ", user)
   const users=[
     {
       id:1,
