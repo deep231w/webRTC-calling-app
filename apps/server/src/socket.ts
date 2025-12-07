@@ -3,6 +3,7 @@ import type {Server as HttpServer} from 'http';
 
 const socketToEmailMap =new Map();
 const emailToSocketMap= new Map();
+const onlineUsers= new Map();
 
 export function InitSocket(server:HttpServer){
     const io= new Server(server,{
@@ -11,6 +12,12 @@ export function InitSocket(server:HttpServer){
 
     io.on("connection",(socket)=>{
         console.log("socket connected - ", socket.id);
+
+        socket.on("user-connected", (userId)=>{
+            onlineUsers.set(userId, socket.id)
+
+            socket.emit("online-users", Array.from(onlineUsers.keys()));
+        })
 
         socket.on("join-room",(email:string, room:string)=>{
             console.log("joined room user - ", email, room);
