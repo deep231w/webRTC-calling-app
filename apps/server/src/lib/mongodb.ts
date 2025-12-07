@@ -1,7 +1,7 @@
-import { configDotenv } from "dotenv";
+import dotenv from "dotenv";
 import mongoose from "mongoose";
 
-configDotenv()
+dotenv.config()
 
 const MONGODB_URI = process.env.MONGODB_URI as string;
 console.log("db -", MONGODB_URI)
