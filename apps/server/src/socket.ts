@@ -53,6 +53,15 @@ export function InitSocket(server:HttpServer){
 
         socket.on("disconnect",()=>{
             console.log("client disconnected -", socket.id);
+            for (const [userId, sockId] of onlineUsers.entries()) {
+                if (sockId === socket.id) {
+                    onlineUsers.delete(userId);
+                    break;
+                }
+            }
+
+            io.emit("online-users", Array.from(onlineUsers.keys()));
+
         })
     })
 }

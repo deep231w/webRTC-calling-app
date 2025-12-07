@@ -45,6 +45,9 @@ export default function Home() {
       setOnlineUsers(users)
     })
 
+    return ()=>{
+      socket?.off("online-users");
+    }
   },[socket, user])
 
   const fetchUsers= async ()=>{
