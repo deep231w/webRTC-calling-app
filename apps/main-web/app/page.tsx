@@ -3,28 +3,65 @@
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { UserCard } from "@/components/UserCard";
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+interface ApiResponse{
+  message:string,
+  users:User[]
+}
 export default function Home() {
 
-  const users=[
-    {
-      id:1,
-      name:"Deepak Maharana",
-    },{
-      id:2,
-      name:"Sumit Maharana"
-    },{
-      id:3,
-      name:"Raju Bro"
-    },{
-      id:4,
-      name:"Jayi Bhujubala"
-    }
-  ]
+  const [user, setUser] = useState<any>(null);
+  const [users ,setUsers]=useState<any[]>([]);
+  useEffect(() => {
+      const data = localStorage.getItem("user");
+      console.log("data", data)
+      if (data) {
+          setUser(JSON.parse(data));
+      }
 
+  }, []);
+
+
+  const fetchUsers= async ()=>{
+    try{
+      const response= await axios.get<ApiResponse>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users`)
+
+      console.log("response of fetch users- ", response);
+
+      const users= response?.data?.users?.map((user)=>(
+        {id:user._id ,name:user.name}
+      ))
+
+      setUsers(users);
+
+      console.log("after mapped users- ", users);
+
+
+    }catch(e){
+      console.log("error during fetch users- ", e);
+    }
+  }
+
+  useEffect(()=>{
+    fetchUsers();
+  },[])
   return (
     <>
       <Navbar/>
-        {users.map((user)=>(
+        {users
+        .filter((u) => u.id !== user?._id)
+        .map((user)=>(
 
           <div key={user.id} className="px-5 py-5">
             <UserCard name={user.name}/>
