@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { UserCard } from "@/components/UserCard";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useSocket } from "./providers/socket";
 
 interface User {
   _id: string;
@@ -23,6 +24,10 @@ export default function Home() {
 
   const [user, setUser] = useState<any>(null);
   const [users ,setUsers]=useState<any[]>([]);
+  const {socket}=useSocket();
+
+  const [onlineUsersId ,setOnlineUsers]=useState<any[]>([]);
+
   useEffect(() => {
       const data = localStorage.getItem("user");
       console.log("data", data)
@@ -32,6 +37,15 @@ export default function Home() {
 
   }, []);
 
+  //online users track-
+  useEffect(()=>{
+    socket?.emit('user-connected',user?._id);
+
+    socket?.on('online-users',(users)=>{
+      setOnlineUsers(users)
+    })
+
+  },[socket, user])
 
   const fetchUsers= async ()=>{
     try{
@@ -64,7 +78,10 @@ export default function Home() {
         .map((user)=>(
 
           <div key={user.id} className="px-5 py-5">
-            <UserCard name={user.name}/>
+            <UserCard 
+              name={user.name} 
+              isOnline={onlineUsersId.includes(user.id)}
+            />
           </div>
 
         ))}
