@@ -14,6 +14,7 @@ export function InitSocket(server:HttpServer){
         console.log("socket connected - ", socket.id);
 
         socket.on("user-connected", (userId)=>{
+            console.log("new user online uid- ", userId)
             onlineUsers.set(userId, socket.id)
 
             socket.emit("online-users", Array.from(onlineUsers.keys()));
@@ -55,6 +56,7 @@ export function InitSocket(server:HttpServer){
             console.log("client disconnected -", socket.id);
             for (const [userId, sockId] of onlineUsers.entries()) {
                 if (sockId === socket.id) {
+                    console.log("user id offline - uid- ", userId)
                     onlineUsers.delete(userId);
                     break;
                 }

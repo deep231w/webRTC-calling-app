@@ -39,14 +39,20 @@ export default function Home() {
 
   //online users track-
   useEffect(()=>{
+    if(!socket || !user?._id){
+      return;
+    }
+
     socket?.emit('user-connected',user?._id);
 
-    socket?.on('online-users',(users)=>{
-      setOnlineUsers(users)
-    })
+    const handleOnlineUsers= (users:any[])=>{
+      setOnlineUsers(users);
+    }
+
+    socket?.on('online-users',handleOnlineUsers)
 
     return ()=>{
-      socket?.off("online-users");
+      socket?.off("online-users", handleOnlineUsers);
     }
   },[socket, user])
 
