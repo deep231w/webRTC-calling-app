@@ -82,18 +82,18 @@ export default function Home() {
   return (
     <>
       <Navbar/>
+      <div className="grid grid-cols-3 gap-4">
         {users
         .filter((u) => u.id !== user?._id)
         .map((user)=>(
-
-          <div key={user.id} className="px-5 py-5">
-            <UserCard 
-              name={user.name} 
-              isOnline={onlineUsersId.includes(user.id)}
-            />
-          </div>
-
+            <div key={user.id} className="">
+              <UserCard 
+                name={user.name} 
+                isOnline={onlineUsersId.includes(user.id)}
+              />
+            </div>
         ))}
+      </div>
     </>
   );
 }

@@ -19,7 +19,7 @@ export  function Navbar (){
 
 
     return(
-        <div className="mx-3 my-3 shadow-xl/10 border rounded-xl border-solid ">
+        <div className=" my-3 shadow-xl/10 border rounded-xl border-solid ">
             <div className="px-5 py-3 flex justify-between items-center">
                 <div>
                     {user?.name?.charAt(0).toUpperCase() + user?.name?.slice(1) || "Guest"}
