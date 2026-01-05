@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, ReactNode, useContext, useEffect, useMemo, useRef } from "react";
+import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { io ,Socket} from 'socket.io-client';
 
 interface SocketContextType{
@@ -10,23 +10,40 @@ interface SocketContextType{
 const SocketContext= createContext<SocketContextType | null>(null)
 
 export function SocketProvider({children}:{children:ReactNode}){
-    const socketRef= useRef<Socket | null>(null);
+    //using state to store socket 
+    const [socket , setScoket] =useState<Socket | null>(null);
+
+    useEffect(()=>{
+        const s= io('http://localhost:5000');
+        setScoket(s)
+
+        return ()=>{
+            s.disconnect();
+        }
+    },[])
+
+    //USING REF TO STORE SOCKET
+    // const socketRef= useRef<Socket | null>(null);
 
     // const socket= useMemo(()=>io('http://localhost:5000'),[])
 
-    useEffect(()=>{
-        if(!socketRef.current){
-            socketRef.current=io('http://localhost:5000');
-        }
+    // useEffect(()=>{
+    //     if(!socketRef.current){
+    //         console.log("inside socket providers not socketref current checking >>>>>>>>>>>>>>")
+    //         socketRef.current=io('http://localhost:5000');
+    //         console.log("after socket connection , socket-", socketRef.current)
+    //         console.log("exiting from inside socket providers not socketref current checking >>>>>>>>>>")
 
-        return ()=>{
-            socketRef.current?.disconnect();
-            socketRef.current=null;
-        }
-    },[])
+    //     }
+
+    //     return ()=>{
+    //         socketRef.current?.disconnect();
+    //         socketRef.current=null;
+    //     }
+    // },[])
     
 
-    return <SocketContext.Provider value={{socket :socketRef.current}}>
+    return <SocketContext.Provider value={{socket }}>
                 {children}
             </SocketContext.Provider>
 }

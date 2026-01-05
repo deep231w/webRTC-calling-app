@@ -12,13 +12,24 @@ export function InitSocket(server:HttpServer){
 
     io.on("connection",(socket)=>{
         console.log("socket connected - ", socket.id);
+        console.log("users - ",Array.from(onlineUsers.values()) )
+
+        socket.onAny((event ,...args)=>{
+            console.log("event recieved - ", event, args)
+        })
 
         socket.on("user-connected", (userId)=>{
+            console.log("inside user-connected event and user id is - ", userId)
             console.log("new user online uid- ", userId)
             onlineUsers.set(userId, socket.id)
+            console.log("current online users in connected socket - ", Array.from(onlineUsers.entries()));
 
-            socket.emit("online-users", Array.from(onlineUsers.keys()));
+            io.emit("online-users", Array.from(onlineUsers.keys()));
+            
         })
+
+        //socket.on("",()=>{})
+
 
         socket.on("join-room",(email:string, room:string)=>{
             console.log("joined room user - ", email, room);
@@ -64,6 +75,7 @@ export function InitSocket(server:HttpServer){
 
             io.emit("online-users", Array.from(onlineUsers.keys()));
 
+            console.log("current online users - ", Array.from(onlineUsers.entries()));
         })
     })
 }

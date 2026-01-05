@@ -39,11 +39,20 @@ export default function Home() {
 
   //online users track-
   useEffect(()=>{
+    console.log("inside use effect")
+    console.log("socket inside useeffect and user id - ",socket , user?._id);
     if(!socket || !user?._id){
+      console.log("existing from useeffect -------")
       return;
     }
 
-    socket?.emit('user-connected',user?._id);
+    console.log("before user socket connected check ")
+    if(socket){
+      console.log("isnide socket connected")
+      socket?.emit('user-connected',user?._id);
+      console.log("after user connected even emits .....")
+    }
+    
 
     const handleOnlineUsers= (users:any[])=>{
       setOnlineUsers(users);
@@ -54,7 +63,7 @@ export default function Home() {
     return ()=>{
       socket?.off("online-users", handleOnlineUsers);
     }
-  },[socket, user])
+  },[socket, user?._id])
 
   const fetchUsers= async ()=>{
     try{
