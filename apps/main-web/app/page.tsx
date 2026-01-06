@@ -6,6 +6,7 @@ import { UserCard } from "@/components/UserCard";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useSocket } from "./providers/socket";
+import CallInfoModal from "@/components/CallInfoModal";
 
 interface User {
   _id: string;
@@ -25,6 +26,8 @@ export default function Home() {
   const [user, setUser] = useState<any>(null);
   const [users ,setUsers]=useState<any[]>([]);
   const {socket}=useSocket();
+  const [gettingCall ,  setGettingCall]=useState(true);
+
 
   const [onlineUsersId ,setOnlineUsers]=useState<any[]>([]);
 
@@ -103,6 +106,11 @@ export default function Home() {
             </div>
         ))}
       </div>
+
+      {gettingCall &&
+        <CallInfoModal onClose={()=>setGettingCall(false)}/>
+      }
+
     </>
   );
 }
