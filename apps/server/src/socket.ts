@@ -3,6 +3,7 @@ import type {Server as HttpServer} from 'http';
 
 const socketToEmailMap =new Map();
 const emailToSocketMap= new Map();
+//
 const onlineUsers= new Map();
 
 export function InitSocket(server:HttpServer){
@@ -27,9 +28,6 @@ export function InitSocket(server:HttpServer){
             io.emit("online-users", Array.from(onlineUsers.keys()));
             
         })
-
-        //socket.on("",()=>{})
-
 
         socket.on("join-room",(email:string, room:string)=>{
             console.log("joined room user - ", email, room);
@@ -60,6 +58,23 @@ export function InitSocket(server:HttpServer){
 
             io.to(to).emit('recieve_candidate',{from:socket.id , candidate});
             
+        })
+
+        //calling functionality
+        socket.on("call:send-call", ({roomid , touserid , fromuserid})=>{
+            try{
+                console.log("inside send-call event -- call sending from -------- ", fromuserid)
+                const recieverSocketId= onlineUsers.get(touserid);
+                console.log("reciever socket id- ", recieverSocketId)
+                if(!recieverSocketId){
+                    console.log("user is offline users userId- ", touserid);
+                    return;
+                }
+
+                io.to(recieverSocketId).emit("call:incoming-call", {roomid , fromuserid});
+            }catch(e){
+                console.log("error during call event - ", e);
+            }            
         })
         
 

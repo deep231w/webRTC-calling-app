@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useSocket } from "./providers/socket";
 import CallInfoModal from "@/components/CallInfoModal";
+import { useRouter } from "next/navigation";
 
 interface User {
   _id: string;
@@ -27,6 +28,7 @@ export default function Home() {
   const [users ,setUsers]=useState<any[]>([]);
   const {socket}=useSocket();
   const [gettingCall ,  setGettingCall]=useState(true);
+  const router= useRouter();
 
 
   const [onlineUsersId ,setOnlineUsers]=useState<any[]>([]);
@@ -91,6 +93,37 @@ export default function Home() {
   useEffect(()=>{
     fetchUsers();
   },[])
+
+  //call a persion
+  const handleCall=(senderuser:{id:string , name:string})=>{
+    try{
+      console.log("inside handlecall- ", socket , user._id)
+
+      if(!socket || !user?._id){
+        console.log("exiting from handle call ......");
+        return;
+      }
+      console.log("call user details-", senderuser);
+      const roomid= crypto.randomUUID();
+      router.push(`/call/${roomid}`);    
+      socket.emit("call:send-call", {roomid ,touserid:senderuser.id, fromuserid:user?._id })
+      
+    }catch(e){
+      console.log("error in handlecall- ", e);
+    }
+  }
+
+  useEffect(()=>{
+    socket?.on("call:incoming-call", ({ roomid, fromuserid }) => {
+      console.log("incoming call", roomid, fromuserid);
+    });
+    
+    return ()=>{
+      socket?.off("call:incoming-call");
+      
+    }
+  },[socket])
+
   return (
     <>
       <Navbar/>
@@ -102,6 +135,8 @@ export default function Home() {
               <UserCard 
                 name={user.name} 
                 isOnline={onlineUsersId.includes(user.id)}
+                onClickToCall={()=>handleCall(user)}
+
               />
             </div>
         ))}
