@@ -1,13 +1,14 @@
 interface CallInfoModalProps {
   onClose: () => void;
   onAccept:()=>void;
+  callerName:string;
 }
 
-export default function CallerIdComponent({ onClose, onAccept }: CallInfoModalProps) {
+export default function CallerIdComponent({ onClose, onAccept ,callerName}: CallInfoModalProps) {
   return (
     <div className="flex items-center justify-between rounded-xl bg-green-300 p-2">
       <span className="text-lg leading-none">
-        Deepak
+        {callerName}
       </span>
       <div className="flex items-center gap-2">
         <button

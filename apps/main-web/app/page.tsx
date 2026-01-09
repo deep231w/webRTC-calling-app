@@ -22,13 +22,21 @@ interface ApiResponse{
   message:string,
   users:User[]
 }
+
+type callerInfo={
+  roomid:string;
+  fromuserid:string;
+  fromusername:string;
+}
 export default function Home() {
 
   const [user, setUser] = useState<any>(null);
   const [users ,setUsers]=useState<any[]>([]);
   const {socket}=useSocket();
-  const [gettingCall ,  setGettingCall]=useState(true);
+  const [gettingCall ,  setGettingCall]=useState(false);
   const router= useRouter();
+
+  const [callersInfo  ,setCallersInfo]=useState<callerInfo[]>([])
 
 
   const [onlineUsersId ,setOnlineUsers]=useState<any[]>([]);
@@ -113,16 +121,43 @@ export default function Home() {
     }
   }
 
+  // const handlecallersInfo =({roomid, fromuserid}:{roomid:string,fromuserid:string})=>{
+  //   console.log("caller info- ", roomid ,fromuserid);
+
+  //   setCallersInfo({roomid ,fromuserid})
+
+  // }
+
   useEffect(()=>{
     socket?.on("call:incoming-call", ({ roomid, fromuserid }) => {
       console.log("incoming call", roomid, fromuserid);
+
+      console.log("users before caller found - ", users)
+      const caller= users.find(u=> u.id ===fromuserid);
+
+      console.log("caller is - ", caller);
+
+      setCallersInfo(prev=> [
+        ...prev,
+        {
+          roomid,
+          fromuserid,
+          fromusername:caller.name
+        }
+      ])
+
+      console.log("getting call from -", callersInfo)
+
+      setGettingCall(true);
+      // handlecallersInfo({roomid,fromuserid});
+
     });
     
     return ()=>{
       socket?.off("call:incoming-call");
       
     }
-  },[socket])
+  },[socket ,users])
 
   return (
     <>
@@ -142,8 +177,20 @@ export default function Home() {
         ))}
       </div>
 
-      {gettingCall &&
-        <CallInfoModal onClose={()=>setGettingCall(false)}/>
+      {gettingCall && 
+        callersInfo.map(caller=>(
+          <CallInfoModal
+            key={caller.roomid}
+            onClose={()=>setGettingCall(false)}
+            callerName={caller.fromusername}
+            onAccept={()=>router.push(`/call/${caller.roomid}`)}
+            onReject={()=>
+              setCallersInfo(prev=>
+                prev.filter(c=>c.roomid !==caller.roomid)
+            )}
+          />
+        ))
+      
       }
 
     </>
