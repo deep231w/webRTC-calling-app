@@ -80,8 +80,44 @@ export function InitSocket(server:HttpServer){
         socket.on("call:accepted",({fromuserid ,touserid, roomid})=>{
             console.log("user B accepted call and here B's userid and roomid ,  touserid- ", fromuserid , roomid, touserid);
 
+            const socketIdofA = onlineUsers.get(touserid);
+            if(!socketIdofA) {
+                console.log("user A is not online");
+                return;
+            }
+
+            io.to(socketIdofA).emit("call:callgotaccepted", {fromuserid ,roomid});
+
         })
         
+        //webrtc connection
+
+        socket.on("peer:offer", ({fromuserid , touserid , roomid, offer})=>{
+            console.log(`offer coming from user A , HERE user A's id- ${fromuserid} , to send B's id- ${touserid} ,  and room id -${roomid},offer- ${offer}` )
+            
+            const touseridSocketId= onlineUsers.get(touserid);
+            console.log(`B id- ${touserid} ,B socketid-`,touseridSocketId)
+            
+            if(!touseridSocketId){
+                console.log("user B/ TOUSERSOCKETID is offline - ")
+                return;
+            }
+
+            io.to(touseridSocketId).emit("peer:recieve-offer", {fromuserid , roomid , offer});
+            console.log("offer sent to B- -----------------")
+        })
+
+        socket.on("peer:accept",({fromuserid,touserid, roomid ,answer})=>{
+            console.log(`B accpeted offer and here is Answer from B- ${answer} , B's id - ${fromuserid}, touserid /A- ,${touserid}, roomid:${roomid}`);
+            const touseridAsSocketId= onlineUsers.get(touserid);
+            if(!touseridAsSocketId){
+                console.log("user is offline ");
+                return;
+            }
+
+            io.to(touseridAsSocketId).emit("peer:onAnswer-recieve", {fromuserid ,roomid , answer});
+
+        })
 
         socket.on("disconnect",()=>{
             console.log("client disconnected -", socket.id);
