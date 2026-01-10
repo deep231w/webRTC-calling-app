@@ -76,6 +76,11 @@ export function InitSocket(server:HttpServer){
                 console.log("error during call event - ", e);
             }            
         })
+
+        socket.on("call:accepted",({fromuserid ,touserid, roomid})=>{
+            console.log("user B accepted call and here B's userid and roomid ,  touserid- ", fromuserid , roomid, touserid);
+
+        })
         
 
         socket.on("disconnect",()=>{
