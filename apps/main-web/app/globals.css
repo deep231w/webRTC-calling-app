@@ -217,3 +217,40 @@ button:hover {
     @apply bg-background text-foreground;
   }
 }
+
+.main-grid-wrapper{
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 4fr 1fr;
+}
+
+.grid-item-1{
+  padding: 2px;
+  gap: 3px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  
+
+}
+.grid-item-2{
+  display: flex;
+  justify-content: center;
+}
+.grid-item-2 button{
+  display: flex;
+  height: 30px;
+  align-items: center;
+}
+
+.sub-grid-item{
+  border: 2px solid black;
+  border-radius: 10px;
+  padding: 4px;
+  gap: 4px;
+  display: grid;
+  grid-template-rows: 19fr 1fr;
+}
+.sub-grid-item h1{
+  display: flex;
+  justify-content: center;
+}

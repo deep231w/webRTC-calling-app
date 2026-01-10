@@ -35,6 +35,7 @@ export default function Home() {
   const {socket}=useSocket();
   const [gettingCall ,  setGettingCall]=useState(false);
   const router= useRouter();
+  const [uniRoomId ,setUniRoomId]=useState<string | null>(null);
 
   const [callersInfo  ,setCallersInfo]=useState<callerInfo[]>([])
 
@@ -113,6 +114,7 @@ export default function Home() {
       }
       console.log("call user details-", senderuser);
       const roomid= crypto.randomUUID();
+      setUniRoomId(roomid);
       router.push(`/call/${roomid}`);    
       socket.emit("call:send-call", {roomid ,touserid:senderuser.id, fromuserid:user?._id })
       
@@ -131,6 +133,7 @@ export default function Home() {
   useEffect(()=>{
     socket?.on("call:incoming-call", ({ roomid, fromuserid }) => {
       console.log("incoming call", roomid, fromuserid);
+      setUniRoomId(roomid);
 
       console.log("users before caller found - ", users)
       const caller= users.find(u=> u.id ===fromuserid);
@@ -183,7 +186,11 @@ export default function Home() {
             key={caller.roomid}
             onClose={()=>setGettingCall(false)}
             callerName={caller.fromusername}
-            onAccept={()=>router.push(`/call/${caller.roomid}`)}
+            onAccept={()=>{
+              router.push(`/call/${caller.roomid}`)
+              socket?.emit("call:accepted", ({fromuserid:user?._id, touserid:caller.fromuserid,roomid:uniRoomId}))
+            }}
+
             onReject={()=>
               setCallersInfo(prev=>
                 prev.filter(c=>c.roomid !==caller.roomid)
