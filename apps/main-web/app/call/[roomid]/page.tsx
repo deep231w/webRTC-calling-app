@@ -2,7 +2,7 @@
 import { UsePeer } from "@/app/providers/peer";
 import { useSocket } from "@/app/providers/socket";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 // interface PageProps{
 //     params:Promise<{
 //         roomid:string
@@ -14,6 +14,7 @@ export default function (){
     const roomid=params.roomid as string;
     const {socket}=useSocket();
     const [user, setUser] = useState<any>(null);
+    const userRef= useRef<any>(null);
 
     const {peer}=UsePeer();
 
@@ -23,7 +24,9 @@ export default function (){
           const data = localStorage.getItem("user");
           console.log("data", data)
           if (data) {
-              setUser(JSON.parse(data));
+            const parsed= JSON.parse(data)
+            setUser(parsed);
+            userRef.current=parsed;
           }
     
     }, []);
@@ -43,12 +46,12 @@ export default function (){
         console.log("offer created - ", offer);
 
         console.log("user ------", user)
-        socket?.emit("peer:offer", {fromuserid:user._id , touserid:fromuserid , roomid, offer});
+        socket?.emit("peer:offer", {fromuserid:userRef.current._id , touserid:fromuserid , roomid, offer});
         console.log("peer:offer emmited- -----")
     }
 
     const handleOnRecieveOffer=async ({fromuserid , roomid , offer}:{fromuserid:string, roomid:string ,offer:RTCSessionDescription})=>{
-        console.log(`offfer from A -${offer} , A's id- ${fromuserid} , roomId- ${roomid}` )
+        try{console.log(`offfer from A -${offer} , A's id- ${fromuserid} , roomId- ${roomid}` )
 
         if(!peer){
             console.log("peer is not created in recieveofferhandle ");
@@ -59,7 +62,10 @@ export default function (){
         await peer.setLocalDescription(new RTCSessionDescription(answer));
 
         socket?.emit("peer:answer",{fromuserid:user._id,touserid:fromuserid, roomid ,answer })
-
+        }catch(e){
+            console.log("error in recieve offer - ", e);
+            
+        }
 
     }
     
@@ -69,7 +75,11 @@ export default function (){
     }
 
     useEffect(()=>{
-        if(!socket) return;
+        try{
+            if(!socket) {
+            console.log("exiting from socket handlers useeffect----")
+            return
+        }
 
         socket?.on("call:callgotaccepted" ,onAccptedCallHandle);
         socket?.on("peer:recieve-offer", handleOnRecieveOffer);
@@ -79,9 +89,11 @@ export default function (){
             socket.off("call:callgotaccepted", onAccptedCallHandle);
             socket.off("peer:recieve-offer",handleOnRecieveOffer);
             socket.off("peer:onAnswer-recieve",handleAnswerRecieve);
+        }}catch(e){
+            console.log("error in signaling handles- ",e);
         }
 
-    },[socket, user ,peer])
+    },[socket])
 
     return(
         <div className="main-grid-wrapper ">

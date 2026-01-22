@@ -11,39 +11,39 @@ const SocketContext= createContext<SocketContextType | null>(null)
 
 export function SocketProvider({children}:{children:ReactNode}){
     //using state to store socket 
-    const [socket , setScoket] =useState<Socket | null>(null);
-
-    useEffect(()=>{
-        const s= io('http://localhost:5000');
-        setScoket(s)
-
-        return ()=>{
-            s.disconnect();
-        }
-    },[])
-
-    //USING REF TO STORE SOCKET
-    // const socketRef= useRef<Socket | null>(null);
-
-    // const socket= useMemo(()=>io('http://localhost:5000'),[])
+    // const [socket , setScoket] =useState<Socket | null>(null);
 
     // useEffect(()=>{
-    //     if(!socketRef.current){
-    //         console.log("inside socket providers not socketref current checking >>>>>>>>>>>>>>")
-    //         socketRef.current=io('http://localhost:5000');
-    //         console.log("after socket connection , socket-", socketRef.current)
-    //         console.log("exiting from inside socket providers not socketref current checking >>>>>>>>>>")
-
-    //     }
+    //     const s= io('http://localhost:5000');
+    //     setScoket(s)
 
     //     return ()=>{
-    //         socketRef.current?.disconnect();
-    //         socketRef.current=null;
+    //         s.disconnect();
     //     }
     // },[])
+
+    //USING REF TO STORE SOCKET
+    const socketRef= useRef<Socket | null>(null);
+
+    // const socket= useMemo(()=>io('http://localhost:5000'),[])
+    if (!socketRef.current) {
+        socketRef.current = io('http://localhost:5000', {
+        transports: ['websocket'],
+        });
+    }
+
+
+    useEffect(()=>{
+        const socket =socketRef.current;
+
+        return ()=>{
+            socket?.disconnect();
+            socketRef.current=null;
+        }
+    },[])
     
 
-    return <SocketContext.Provider value={{socket }}>
+    return <SocketContext.Provider value={{socket:socketRef.current }}>
                 {children}
             </SocketContext.Provider>
 }
